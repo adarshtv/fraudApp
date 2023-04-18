@@ -10,19 +10,19 @@ const router = express.Router();
 
 router.post('/add',authenticationToken, async(req,res)=>{
     try {
-        const {name, cardnumber, shopname, mobile} = req.body;
-        if(!name || !cardnumber || !shopname || !mobile){
+        const {name, address, mobile} = req.body;
+        if(!name  || !address || !mobile){
             res.status(400).json({'status':'fail',message: 'Please enter all fields!'})
         }
         else{
             const member = await pool.query(
-                `INSERT INTO members (name, cardnumber, shopname, mobile)
-                VALUES ($1, $2, $3, $4)`, [name,cardnumber,shopname, mobile]);
+                `INSERT INTO members (name, address, mobile)
+                VALUES ($1, $2, $3)`, [name, address, mobile]);
             res.status(201).json({status:'success', message: 'Member added successfully!'})
         }
     } catch (error) {
         if(error.message.includes('uniquecard')){
-            res.status(400).json({'status':'fail',message: 'Card member already added!'});
+            res.status(400).json({'status':'fail',message: 'Member already added!'});
         }
         else{
             res.status(400).json({'status':'fail',message: 'Unexpected error occured. Please try again!'})
@@ -32,7 +32,7 @@ router.post('/add',authenticationToken, async(req,res)=>{
 
 router.put('/update',authenticationToken, async(req,res)=>{
     try {
-        const {id, name, cardnumber, shopname, mobile} = req.body;
+        const {id, name, address, mobile} = req.body;
         if(id){
             let query = `UPDATE members SET `;
             let count=0;
@@ -41,76 +41,36 @@ router.put('/update',authenticationToken, async(req,res)=>{
                 query+=`name=$1 `;
                 count+=1;
                 updateArray.push(name);
-                if(shopname){
-                    query+=`,shopname=$2 `;
+                if(address){
+                    query+=`,address=$2 `;
                     count+=1;
-                    updateArray.push(shopname);
+                    updateArray.push(address);
                     if(mobile){
                         query+=`,mobile=$3 `;
                         count+=1;
                         updateArray.push(mobile);
-                        if(cardnumber){
-                            query+=`,cardnumber=$4 `;
-                            count+=1;
-                            updateArray.push(cardnumber);
-                        }
-                    }
-                    else if(cardnumber){
-                        query+=`,cardnumber=$3 `;
-                        count+=1;
-                        updateArray.push(cardnumber);
                     }
                 }
                 else if(mobile){
                     query+=`,mobile=$2 `;
                     count+=1;
                     updateArray.push(mobile)
-                    if(cardnumber){
-                        query+=`,cardnumber=$3 `;
-                        count+=1;
-                        updateArray.push(cardnumber);
-                    }
-                }
-                else if(cardnumber){
-                    query+=`,cardnumber=$2 `;
-                    count+=1;
-                    updateArray.push(cardnumber);
                 }
             }
-            else if(shopname){
-                query+=`shopname=$1 `;
+            else if(address){
+                query+=`address=$1 `;
                 count+=1;
-                updateArray.push(shopname);
+                updateArray.push(address);
                 if(mobile){
                     query+=`,mobile=$2 `;
                     count+=1;
                     updateArray.push(mobile);
-                    if(cardnumber){
-                        query+=`,cardnumber=$3 `;
-                        count+=1;
-                        updateArray.push(cardnumber);
-                    }
-                }
-                else if(cardnumber){
-                    query+=`,cardnumber=$2 `;
-                    count+=1;
-                    updateArray.push(cardnumber);
                 }
             }
             else if(mobile){
                 query+=`mobile=$1 `
                 count+=1;
                 updateArray.push(mobile);
-                if(cardnumber){
-                    query+=`,cardnumber=$2 `;
-                    count+=1;
-                    updateArray.push(cardnumber);
-                }
-            }
-            else if(cardnumber){
-                query+=`,cardnumber=$1 `;
-                count+=1;
-                updateArray.push(cardnumber);
             }
             query+=`WHERE id=$${count+1}`;
             updateArray.push(id);

@@ -21,12 +21,12 @@ router.post('/add', authenticationToken, async(req,res)=>{
                 operation = operation + ` - ${type}`
             }
             await pool.query(
-                `INSERT INTO loans (accountid, operation, amount, transactionDate, remark, userid)
+                `INSERT INTO transactions (accountid, operation, amount, transactionDate, remark, userid)
                 VALUES ($1, $2, $3, $4, $5, $6)`, [accountid, operation, amount, transactionDate, remark? remark.substring(0,199):'',userid]);
-            const member = await pool.query(`SELECT * FROM members WHERE id=$1`,[accountid]);
-            console.log("member:",member);
+            //const member = await pool.query(`SELECT * FROM members WHERE id=$1`,[accountid]);
+            //console.log("member:",member);
             //smsHelper(amount, 'loan',operation,member.rows[0].name,member.rows[0].mobile);
-            res.status(201).json({status:'success', message:'Loan added successfully!'});
+            res.status(201).json({status:'success', message:'Transaction added successfully!'});
         }
     } catch (error) {
         res.status(400).json({status:'fail',message: error.message});
@@ -36,8 +36,8 @@ router.post('/add', authenticationToken, async(req,res)=>{
 router.get('/getByOpertion/:operation', authenticationToken, async(req,res)=>{
     try {
         const operation = req.params.operation;
-        const loans = await pool.query(`SELECT * FROM loans WHERE operation=$1`,[operation]);
-        res.status(200).json({status:'success', loans: loans.rows})
+        const transactions = await pool.query(`SELECT * FROM transactions WHERE operation=$1`,[operation]);
+        res.status(200).json({status:'success', transactions: transactions.rows})
     } catch (error) {
         res.status(400).json({status:'fail',message: error.message});
     }
@@ -46,8 +46,8 @@ router.get('/getByOpertion/:operation', authenticationToken, async(req,res)=>{
 router.get('/getById/:accountid', authenticationToken, async(req,res)=>{
     try {
         const accountid = req.params.accountid;
-        const loans = await pool.query(`SELECT * FROM loans WHERE id=$1`,[accountid]);
-        res.status(200).json({status:'success', loans: loans.rows})
+        const transactions = await pool.query(`SELECT * FROM transactions WHERE id=$1`,[accountid]);
+        res.status(200).json({status:'success', transactions: transactions.rows})
     } catch (error) {
         res.status(400).json({status:'fail',message: error.message});
     }
@@ -56,8 +56,8 @@ router.get('/getById/:accountid', authenticationToken, async(req,res)=>{
 router.get('/getByUserId/:userid', authenticationToken, async(req,res)=>{
     try {
         const userid = req.params.userid;
-        const loans = await pool.query(`SELECT * FROM loans WHERE id=$1`,[userid]);
-        res.status(200).json({status:'success', loans: loans.rows})
+        const transactions = await pool.query(`SELECT * FROM transactions WHERE id=$1`,[userid]);
+        res.status(200).json({status:'success', transactions: transactions.rows})
     } catch (error) {
         res.status(400).json({status:'fail',message: error.message});
     }
@@ -68,7 +68,7 @@ router.put('/update',authenticationToken, async(req,res)=>{
         const {voucher_number, accountid, operation, remark, amount, transactionDate, userid} = req.body;
         const columns = Object.keys(req.body);
         const params = [voucher_number];
-        let query = "UPDATE loans SET ";
+        let query = "UPDATE transactions SET ";
         for(let i=0; i<columns.length;i++){
             query = `${query}${columns[i]} = $${params.length + 1},`
             params.push(req.body[columns[i]]);
