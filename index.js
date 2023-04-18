@@ -20,9 +20,9 @@ app.use(cors(corsOption));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-//app.use('*',express.static(path.join(__dirname,'PaisaSanchay')));
-app.use('/',express.static(path.join(__dirname,'PaisaSanchay')));
-// app.use('/login/reset-password',express.static(path.join(__dirname,'PaisaSanchay')));
+
+// app.use('/',express.static(path.join(__dirname,'PaisaSanchay')));
+
 
 app.use('/users', userRoute);
 app.use('/members', memberRoute);
@@ -32,13 +32,10 @@ app.use('/transactions',loansRoute);
 // app.use('/mdtwf',mdtwfRoute);
 // app.use('/collectionReports',reportsRoute);
 
-app.get('*',(req,res) =>{
-    res.sendFile(path.join(__dirname,'/PaisaSanchay/index.html'));
-});
+// app.get('*',(req,res) =>{
+//     res.sendFile(path.join(__dirname,'/PaisaSanchay/index.html'));
+// });
 
-// app.get('/*', (req, res) => { res.sendFile(path.join(__dirname, 
-//     'PaisaSanchay/index.html'));
-//    });
 
 app.listen(port, ()=>{
     console.log(`Application starting on port ${port}`)
