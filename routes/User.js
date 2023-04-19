@@ -29,8 +29,8 @@ router.post('/register', async (req,res)=>{
             res.json({status: 'failed', message: errors[0].message});
         }
         else{
-            password = password || generatePassword();
-            const hashedPassword = await bcrypt.hash(password,10);
+            newpassword = password || generatePassword();
+            const hashedPassword = await bcrypt.hash(newpassword,10);
             pool.query(
                 `INSERT INTO users (email, username, password, roles)
                 VALUES ($1, $2, $3, $4) RETURNING id`, [email,username,hashedPassword, roles || 'user'], (err,response)=>{
