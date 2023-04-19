@@ -21,7 +21,7 @@ function generatePassword() {
 router.post('/register', async (req,res)=>{
     try{
         const errors = [];
-        const {email, username, roles} = req.body;
+        const {email, username, roles, password} = req.body;
         if(!username || !email){
             errors.push({message: 'Please enter all fields!'});
         }
@@ -29,7 +29,7 @@ router.post('/register', async (req,res)=>{
             res.json({status: 'failed', message: errors[0].message});
         }
         else{
-            const password = generatePassword();
+            password = password || generatePassword();
             const hashedPassword = await bcrypt.hash(password,10);
             pool.query(
                 `INSERT INTO users (email, username, password, roles)
@@ -44,30 +44,35 @@ router.post('/register', async (req,res)=>{
                         }
                     }
                     else{
-                        const id = response.rows[0].id;
-                        const token = forgetJwtToken({id,username,email,password: hashedPassword});
-                        const link = `${process.env.APPLICATION_HOST}/login/reset-password/?id=${response.rows[0].id}&token=${token}`;
-                        var mailOptions = {
-                            from: process.env.MAILER_EMAIL,
-                            to: email,
-                            subject: 'PaisaSanchay: Reset password link',
-                            text: `Hi, 
-        Admin has created a new user with following credentials:
-        email - ${email},
-        username - ${username}
-        Click on this link and reset your password within 1 hour: 
-        ${link}`
-                        };
-                        
-                        mailer.sendMail(mailOptions, function(error, info){
-                            if (error) {
-                                console.log(error);
-                            res.status(400).json({status:'fail', message: 'Something went wrong. Please try again!'})
-                            } else {
-                            console.log('Email sent: ' + info.response);
-                            res.status(201).json({status: 'success', message: 'User registered successfully and reset email link sent to user'});
-                            }
-                        })
+                        if(roles === 'admin'){
+                            res.status(201).json({status: 'success', message: 'Admin registered successfully'});
+                        }
+                        else{
+                            const id = response.rows[0].id;
+                            const token = forgetJwtToken({id,username,email,password: hashedPassword});
+                            const link = `${process.env.APPLICATION_HOST}/login/reset-password/?id=${response.rows[0].id}&token=${token}`;
+                            var mailOptions = {
+                                from: process.env.MAILER_EMAIL,
+                                to: email,
+                                subject: 'PaisaSanchay: Reset password link',
+                                text: `Hi, 
+            Admin has created a new user with following credentials:
+            email - ${email},
+            username - ${username}
+            Click on this link and reset your password within 1 hour: 
+            ${link}`
+                            };
+                            
+                            mailer.sendMail(mailOptions, function(error, info){
+                                if (error) {
+                                    console.log(error);
+                                res.status(400).json({status:'fail', message: 'Something went wrong. Please try again!'})
+                                } else {
+                                console.log('Email sent: ' + info.response);
+                                res.status(201).json({status: 'success', message: 'User registered successfully and reset email link sent to user'});
+                                }
+                            })
+                        }
                     }
                 }
             )
