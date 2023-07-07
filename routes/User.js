@@ -13,7 +13,7 @@ function generatePassword() {
     return Array(8)
         .fill("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
         .map(function (x) {
-            return x[crypto.randomInt(0, 10_000) % x.length];
+            return x[crypto.randomInt(0, 10000) % x.length];
         })
         .join("");
 }
