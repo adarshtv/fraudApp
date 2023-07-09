@@ -99,7 +99,9 @@ router.post('/login', async (req,res)=>{
                 return res.status(401).json({status:'fail',message:'Incorrect email or password'});
             }
             else{
+                console.log("inside else");
                 const token = jwtTokens(users.rows[0]);
+                console.log("token:",token);
                 delete users.rows[0].password;
                 res.cookie('refresh_token',token.refreshToken, {httpOnly: true});
                 return res.status(200).json({status:'success',message:'User authentication successfull', token, user: users.rows[0]});
