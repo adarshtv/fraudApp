@@ -192,8 +192,8 @@ router.get('/all', authenticationToken, async(req,res)=>{
             res.status(200).json({status:'success', result: results.rows})
         }
         else{
-            delete req.query.collectionMode;
-            const collectionModes = ['loans','subscription','kuri','mdtwf'];
+            //delete req.query.collectionMode;
+            //const collectionModes = ['loans','subscription','kuri','mdtwf'];
             const columns = Object.keys(req.query);
             const params = [];
             const results = [];
@@ -207,10 +207,10 @@ router.get('/all', authenticationToken, async(req,res)=>{
                     query = `${query}transactionDate <= $${params.length + 1} AND `
                     params.push(req.query[columns[i]]);
                 }
-                else if(req.query[columns[i]] === 'Opening balance'){
-                    query = `${query}${columns[i]} LIKE $${params.length + 1} AND `
-                    params.push(`%${req.query[columns[i]]}%`);
-                }
+                // else if(req.query[columns[i]] === 'Opening balance'){
+                //     query = `${query}${columns[i]} LIKE $${params.length + 1} AND `
+                //     params.push(`%${req.query[columns[i]]}%`);
+                // }
                 else{
                     const input = req.query[columns[i]].split(',');
                     if(input.length===1){
@@ -231,20 +231,22 @@ router.get('/all', authenticationToken, async(req,res)=>{
                 }
             }
             query = query.substring(0, query.length-4);
-            const collectionMapping = {'loans':'loan','subscription':'subscription','mdtwf':'mdtwf','kuri':'kuri'}
-            const promises = [];
-            for(let coll in collectionModes){
-                promises.push(new Promise(async resolve => {
-                    const fullQuery = `SELECT m1.voucher_number, u.username AS user, m1.operation, m1.amount, m2.name AS member, m2.cardnumber, m1.transactionDate FROM ${collectionModes[coll]} m1 INNER JOIN users u ON m1.userid = u.id INNER JOIN members m2 ON m1.accountid = m2.id WHERE `+query;
-                    console.log("fullQuery:",fullQuery)
-                    console.log("params:",params)
-                    const result = await pool.query(fullQuery,params);
-                    result.rows.map(res=> res.collectionmode = collectionMapping[collectionModes[coll]]);
-                    results.push(...result.rows);
-                    resolve(result.rows);
-                }))
-            }
-
+            //const collectionMapping = {'loans':'loan','subscription':'subscription','mdtwf':'mdtwf','kuri':'kuri'}
+            // const promises = [];
+            // for(let coll in collectionModes){
+            //     promises.push(new Promise(async resolve => {
+            //         const fullQuery = `SELECT m1.voucher_number, u.username AS user, m1.operation, m1.amount, m2.name AS member, m2.cardnumber, m1.transactionDate FROM ${collectionModes[coll]} m1 INNER JOIN users u ON m1.userid = u.id INNER JOIN members m2 ON m1.accountid = m2.id WHERE `+query;
+            //         console.log("fullQuery:",fullQuery)
+            //         console.log("params:",params)
+            //         const result = await pool.query(fullQuery,params);
+            //         result.rows.map(res=> res.collectionmode = collectionMapping[collectionModes[coll]]);
+            //         results.push(...result.rows);
+            //         resolve(result.rows);
+            //     }))
+            // }
+            const fullQuery = `SELECT m1.id, u.username AS user, m1.operation, m1.amount, m2.name AS member, m2.id as memberId, m1.transactiondate FROM transactions m1 INNER JOIN users u ON m1.userid = u.id INNER JOIN members m2 ON m1.accountid = m2.id WHERE `+query;
+            const result = await pool.query(fullQuery,params);
+            results.push(...result.rows);
             Promise.all(promises)
                 .then(result => {
                 //console.log("results:",results);
@@ -257,8 +259,8 @@ router.get('/all', authenticationToken, async(req,res)=>{
                      console.log("y:",y);
                    return x - y;
                });
-               const creditTransactions = ['Receipt','Opening balance - credit'];
-               const debitTransactions = ['Payment','Opening balance - debit'];
+               //const creditTransactions = ['Receipt','Opening balance - credit'];
+               //const debitTransactions = ['Payment','Opening balance - debit'];
                const totalBalance = results.reduce((acc,curr)=>{
                 if(creditTransactions.includes(curr.operation)){
                     acc.credit += parseInt(curr.amount);

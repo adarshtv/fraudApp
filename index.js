@@ -30,7 +30,7 @@ app.use('/transactions',loansRoute);
 // app.use('/subscriptions',subscriptionsRoute);
 // app.use('/kuri',kuriRoute);
 // app.use('/mdtwf',mdtwfRoute);
-// app.use('/collectionReports',reportsRoute);
+app.use('/collectionReports',reportsRoute);
 
 app.get('*',(req,res) =>{
     res.sendFile(path.join(__dirname,'/PaisaSanchay/index.html'));
