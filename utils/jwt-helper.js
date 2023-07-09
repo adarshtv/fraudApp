@@ -1,9 +1,9 @@
 const jwt = require('jsonwebtoken');
 
-async function jwtTokens({id,username,email,roles}) {
+function jwtTokens({id,username,email,roles}) {
     const user = {id,username,email,roles};
-    const accessToken = await jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1d'});
-    const refreshToken = await jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, {expiresIn: '14d'});
+    const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1d'});
+    const refreshToken = jwt.sign(user, process.env.REFRESH_TOKEN_SECRET, {expiresIn: '14d'});
     // real life accesstoken = 20m and refreshtoken = 14 days
     return {accessToken, refreshToken};
 
