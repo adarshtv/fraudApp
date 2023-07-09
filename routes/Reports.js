@@ -257,8 +257,8 @@ router.get('/all', authenticationToken, async(req,res)=>{
                      console.log("y:",y);
                    return x - y;
                });
-               //const creditTransactions = ['Receipt','Opening balance - credit'];
-               //const debitTransactions = ['Payment','Opening balance - debit'];
+               const creditTransactions = ['Receipt','Opening balance - credit'];
+               const debitTransactions = ['Payment','Opening balance - debit'];
                const totalBalance = results.reduce((acc,curr)=>{
                 if(creditTransactions.includes(curr.operation)){
                     acc.credit += parseInt(curr.amount);
