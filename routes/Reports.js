@@ -247,8 +247,6 @@ router.get('/all', authenticationToken, async(req,res)=>{
             const fullQuery = `SELECT m1.id, u.username AS user, m1.operation, m1.amount, m2.name AS member, m2.id as memberId, m1.transactiondate FROM transactions m1 INNER JOIN users u ON m1.userid = u.id INNER JOIN members m2 ON m1.accountid = m2.id WHERE `+query;
             const result = await pool.query(fullQuery,params);
             results.push(...result.rows);
-            Promise.all(promises)
-                .then(result => {
                 //console.log("results:",results);
                 results.sort((x, y) => {
                     console.log("x.transactionDate:",x.transactiondate)
@@ -273,7 +271,6 @@ router.get('/all', authenticationToken, async(req,res)=>{
                console.log("totalBalance:",totalBalance);
                //console.log("results:",results);
                 res.status(200).json({status:'success', result: {results, totalBalance}})
-                })
             
             
         }
