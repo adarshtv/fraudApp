@@ -100,6 +100,7 @@ router.post('/login', async (req,res)=>{
             }
             else{
                 console.log("inside else");
+                delete users.rows[0].password;
                 const token = jwtTokens(users.rows[0]);
                 console.log("token:",token);
                 delete users.rows[0].password;
